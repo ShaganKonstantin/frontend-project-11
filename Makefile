@@ -6,3 +6,6 @@ build:
 
 develop:
 	npx webpack serve	
+
+install:
+	npm ci --legacy-peer-deps
