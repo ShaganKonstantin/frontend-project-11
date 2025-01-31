@@ -1,7 +1,10 @@
 /* eslint-disable global-require */
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 const path = require('path');
 
 module.exports = {
+  mode: process.env.NODE_ENV || 'development',
   entry: './src/js/main.js',
   output: {
     filename: 'main.js',
@@ -29,6 +32,7 @@ module.exports = {
               postcssOptions: {
                 plugins: () => [
                   require('autoprefixer'),
+                  new HtmlWebpackPlugin(),
                 ],
               },
             },
