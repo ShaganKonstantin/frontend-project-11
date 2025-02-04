@@ -1,71 +1,48 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 // eslint-disable-next-line no-unused-vars
 import * as bootstrap from 'bootstrap';
-import onChange from 'on-change';
 import * as yup from 'yup';
-import { createErrorElement, clearInput } from './View.js';
+import initView from './View.js';
 
-const state = {
-  form: {
-    isValid: true,
-    errors: '',
-    url: '',
-  },
-  urls: [],
+const state = initView({});
+
+const urlSchema = yup.string().url().required();
+
+const validateUrl = (url) => urlSchema.isValid(url).then((isValid) => {
+  if (!isValid) {
+    state.error = 'Некорректный URL';
+    return Promise.reject();
+  }
+
+  if (state.feeds.includes(url)) {
+    state.error = 'Этот URL уже добавлен';
+    return Promise.reject();
+  }
+
+  state.error = null; // Сброс ошибки
+  return Promise.resolve(url);
+});
+
+const addFeed = (url) => {
+  state.feeds.push(url);
 };
 
-const watchedState = onChange(state, (path, value) => {
-  const input = document.querySelector('#url-input');
-  const errorMessage = document.querySelector('.error-message');
-
-  if (path === 'form.errors') {
-    if (value) {
-      input.classList.add('is-invalid');
-      errorMessage.textContent = value;
-      errorMessage.style.display = 'block';
-    } else {
-      input.classList.remove('is-invalid');
-      errorMessage.textContent = '';
-      errorMessage.style.display = 'none';
-    }
-  }
-
-  if (path === 'form.isValid' && value) {
-    clearInput(input);
-  }
-});
-
-const schema = yup.object({
-  url: yup.string()
-    .url('Ссылка должна быть валидным URL')
-    .required('Поле обязательно для заполнения')
-    .notOneOf(state.urls, 'RSS уже существует'),
-});
-
-const handleFormSubmit = (event) => {
+const handleSubmit = (event) => {
   event.preventDefault();
-  const input = document.querySelector('#url-input');
-  const url = input.value.trim();
+  const urlInput = document.getElementById('url-input');
 
-  schema.validate({ url })
-    .then(() => {
-      watchedState.urls.push(url);
-      watchedState.form.errors = null;
-      watchedState.form.isValid = true;
-      clearInput(input);
+  validateUrl(urlInput.value)
+    .then((url) => {
+      addFeed(url);
+      urlInput.value = '';
+      urlInput.focus();
     })
-    .catch((err) => {
-      watchedState.form.errors = err.message;// .message создается библиотекой yup
-      watchedState.form.isValid = false;
+    .catch(() => {
+      // Ошибка уже обработана в validateUrl
     });
 };
 
 const init = () => {
-  const form = document.querySelector('.rss-form');
-  form.addEventListener('submit', handleFormSubmit);
-
-  const errorElement = createErrorElement();
-  form.insertAdjacentElement('afterend', errorElement);
+  document.querySelector('.rss-form').addEventListener('submit', handleSubmit);
 };
-
 init();
