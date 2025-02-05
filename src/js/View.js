@@ -1,4 +1,5 @@
 import onChange from 'on-change';
+import i18next from 'i18next';
 
 const render = (state) => {
   const urlInput = document.getElementById('url-input');
@@ -10,7 +11,7 @@ const render = (state) => {
   // Проверка состояния фидов
   if (state.error) {
     urlInput.classList.add('is-invalid');
-    errorMessage.textContent = state.error;
+    errorMessage.textContent = i18next.t(state.error);
   } else {
     urlInput.classList.remove('is-invalid');
   }

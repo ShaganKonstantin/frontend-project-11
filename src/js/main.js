@@ -2,7 +2,25 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // eslint-disable-next-line no-unused-vars
 import * as bootstrap from 'bootstrap';
 import * as yup from 'yup';
+import i18next from 'i18next';
 import initView from './View.js';
+import resources from '../locales/locales.js';
+
+i18next.init({
+  lng: 'ru',
+  fallBackLng: 'en',
+  resources,
+});
+
+yup.setLocale({
+  mixed: {
+    required: () => ({ key: 'required' }),
+    notOneOf: () => ({ key: 'alreadyAdded' }),
+  },
+  string: {
+    url: () => ({ key: 'invalidURL' }),
+  },
+});
 
 const state = initView({});
 
@@ -22,6 +40,19 @@ const validateUrl = (url) => urlSchema.isValid(url).then((isValid) => {
   state.error = null; // Сброс ошибки
   return Promise.resolve(url);
 });
+
+const updateInerfaceTexts = () => {
+  document.title = i18next.t('title');
+
+  const descriptionElement = document.querySelector('.lead');
+  descriptionElement.textContent = i18next.t('description');
+
+  const urlLabelElement = document.querySelector('label[for="url-input"]');
+  urlLabelElement.textContent = i18next.t('urlLabel');
+
+  const addButtonElement = document.querySelector('button[type="submit"]');
+  addButtonElement.textContent = i18next.t('addButton');
+};
 
 const addFeed = (url) => {
   state.feeds.push(url);
@@ -43,6 +74,7 @@ const handleSubmit = (event) => {
 };
 
 const init = () => {
+  updateInerfaceTexts();
   document.querySelector('.rss-form').addEventListener('submit', handleSubmit);
 };
 init();
