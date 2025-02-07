@@ -30,16 +30,18 @@ const renderPosts = (posts, postList) => {
 
 const render = (state) => {
   const urlInput = document.getElementById('url-input');
-  const errorMessage = document.getElementById('error-message');
+  const message = document.getElementById('message');
   const feedsList = document.getElementById('feeds-list');
   const postsList = document.getElementById('posts-list');
+  const submitButton = document.querySelector('button[type="submit"]');
   // Очистка предыдущих сообщений об ошибках
-  errorMessage.textContent = '';
+  message.textContent = '';
 
   // Проверка состояния фидов
   if (state.form.error) {
     urlInput.classList.add('is-invalid');
-    errorMessage.textContent = i18next.t(state.form.error);
+    message.textContent = i18next.t(state.form.error);
+    submitButton.disabled = false;
   } else {
     urlInput.classList.remove('is-invalid');
   }

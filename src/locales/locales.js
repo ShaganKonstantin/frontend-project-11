@@ -7,6 +7,9 @@ const resources = {
       addButton: 'Add',
       invalidURL: 'Invalid URL',
       alreadyAdded: 'This URL is already added',
+      parseError: 'Parsing error',
+      networkError: 'Network error',
+      success: 'RSS feed succesfully added',
     },
   },
   ru: {
@@ -17,6 +20,9 @@ const resources = {
       addButton: 'Добавить',
       invalidURL: 'Некорректный URL',
       alreadyAdded: 'Этот URL уже добавлен',
+      parseError: 'Ошибка парсинга',
+      networkError: 'Ошибка сети',
+      success: 'RSS успешно добавлен',
     },
   },
 };
