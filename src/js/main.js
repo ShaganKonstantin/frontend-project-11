@@ -5,6 +5,8 @@ import * as yup from 'yup';
 import i18next from 'i18next';
 import initView from './View.js';
 import resources from '../locales/locales.js';
+import fetchRSS from './rssFetcher.js';
+import parseRSS from '../rssParser.js';
 
 i18next.init({
   lng: 'ru',
@@ -22,26 +24,31 @@ yup.setLocale({
   },
 });
 
-const state = initView({});
+const state = {
+  form: {
+    error: null,
+  },
+  feeds: [],
+  posts: [],
+  urls: [],
+};
+
+const watchedState = initView(state);
 
 const urlSchema = yup.string().url().required();
 
-const validateUrl = (url) => urlSchema.isValid(url).then((isValid) => {
-  if (!isValid) {
-    state.error = 'Некорректный URL';
-    return Promise.reject();
+const validateUrl = (url) => {
+  try {
+    urlSchema.validateSync(url);
+    watchedState.form.error = null;
+    return url;
+  } catch (error) {
+    watchedState.form.error = error.message;
+    return null;
   }
+};
 
-  if (state.feeds.includes(url)) {
-    state.error = 'Этот URL уже добавлен';
-    return Promise.reject();
-  }
-
-  state.error = null; // Сброс ошибки
-  return Promise.resolve(url);
-});
-
-const updateInerfaceTexts = () => {
+const updateInterfaceTexts = () => {
   document.title = i18next.t('title');
 
   const descriptionElement = document.querySelector('.lead');
@@ -54,27 +61,38 @@ const updateInerfaceTexts = () => {
   addButtonElement.textContent = i18next.t('addButton');
 };
 
-const addFeed = (url) => {
-  state.feeds.push(url);
+const addFeed = (feed, posts) => {
+  watchedState.feeds = [...watchedState.feeds, feed];
+  watchedState.posts = [...watchedState.posts, posts];
 };
 
 const handleSubmit = (event) => {
   event.preventDefault();
   const urlInput = document.getElementById('url-input');
+  const url = urlInput.value;
 
-  validateUrl(urlInput.value)
-    .then((url) => {
-      addFeed(url);
+  const validatedUrl = validateUrl(url);
+
+  if (!validatedUrl) {
+    return;
+  }
+
+  fetchRSS(validatedUrl)
+    .then((data) => {
+      const { feed, posts } = parseRSS(data);
+      addFeed(feed, posts);
+      state.urls.push(validatedUrl);
       urlInput.value = '';
       urlInput.focus();
     })
-    .catch(() => {
-      // Ошибка уже обработана в validateUrl
+    .catch((error) => {
+      console.error('Error fetching or parsing RSS:', error);
+      watchedState.form.error = 'parseError';
     });
 };
 
 const init = () => {
-  updateInerfaceTexts();
+  updateInterfaceTexts();
   document.querySelector('.rss-form').addEventListener('submit', handleSubmit);
 };
 init();
