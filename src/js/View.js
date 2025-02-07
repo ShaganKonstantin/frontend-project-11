@@ -1,5 +1,7 @@
 import onChange from 'on-change';
 import i18next from 'i18next';
+import fetchRSS from './rssFetcher.js';
+import parseRSS from '../rssParser.js';
 
 const renderFeeds = (feeds, feedsList) => {
   // eslint-disable-next-line no-param-reassign
@@ -12,9 +14,9 @@ const renderFeeds = (feeds, feedsList) => {
   });
 };
 
-const renderPosts = (posts, postList) => {
+const renderPosts = (posts, postsList) => {
   // eslint-disable-next-line no-param-reassign
-  postList.innerHTML = '';
+  postsList.innerHTML = '';
   posts.forEach((post) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item');
@@ -24,7 +26,22 @@ const renderPosts = (posts, postList) => {
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     li.appendChild(a);
-    postList.appendChild(li);
+    postsList.appendChild(li);
+  });
+};
+
+const updateUIWithNewPosts = (newPosts) => {
+  const postsList = document.getElementById('posts-list');
+  newPosts.forEach((post) => {
+    const li = document.createElement('li');
+    li.classList.add('list-group-item');
+    const a = document.createElement('a');
+    a.href = post.link;
+    a.textContent = post.title;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    li.appendChild(a);
+    postsList.appendChild(li);
   });
 };
 
@@ -41,6 +58,8 @@ const render = (state) => {
   if (state.form.error) {
     urlInput.classList.add('is-invalid');
     message.textContent = i18next.t(state.form.error);
+    message.classList.remove('text-success');
+    message.classList.add('text-danger');
     submitButton.disabled = false;
   } else {
     urlInput.classList.remove('is-invalid');
@@ -62,9 +81,36 @@ const createWatchers = (state) => onChange(state, (path, value) => {
   }
 });
 
+const checkForUpdates = (state, watchedState) => {
+  state.urls.forEach((url) => {
+    fetchRSS(url)
+      .then((data) => {
+        // eslint-disable-next-line no-unused-vars
+        const { feed, posts } = parseRSS(data);
+
+        const newPosts = posts.filter(
+          (post) => !state.posts.some((existingPost) => existingPost.link === post.link),
+        );
+        if (newPosts.length > 0) {
+          // eslint-disable-next-line no-param-reassign
+          watchedState.posts = [...watchedState.posts, ...newPosts];
+          updateUIWithNewPosts(newPosts);
+        } else {
+          console.log(`No new posts for ${url}`);
+        }
+      })
+      // eslint-disable-next-line no-unused-vars
+      .catch((error) => {
+        console.error(`Fetching error for ${url}`);
+      });
+  });
+  setTimeout(() => checkForUpdates(state, watchedState, fetchRSS, parseRSS, i18next), 5000);
+};
+
 const initView = (state) => {
   const watchedState = createWatchers(state);
   return watchedState;
 };
 
 export default initView;
+export { checkForUpdates };
