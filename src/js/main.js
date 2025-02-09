@@ -6,7 +6,7 @@ import i18next from 'i18next';
 import initView, { checkForUpdates } from './View.js';
 import resources from '../locales/locales.js';
 import fetchRSS from './rssFetcher.js';
-import parseRSS from '../rssParser.js';
+import parseRSS from './rssParser.js';
 
 i18next.init({
   lng: 'ru',
@@ -31,6 +31,7 @@ const state = {
   feeds: [],
   posts: [],
   urls: [],
+  readPosts: new Set(),
 };
 
 const watchedState = initView(state);
@@ -128,4 +129,5 @@ const init = () => {
 
   setTimeout(() => checkForUpdates(state, watchedState), 5000);
 };
+
 init();
