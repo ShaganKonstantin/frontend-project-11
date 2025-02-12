@@ -46,7 +46,7 @@ const validateUrl = (url) => {
   // eslint-disable-next-line no-unused-vars
   } catch (error) {
     // console.log(error.message);
-    watchedState.form.error = 'invalidURL';
+    watchedState.form.error = 'Ссылка должна быть валидным URL';
     return null;
   }
 };
