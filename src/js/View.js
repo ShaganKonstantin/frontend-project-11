@@ -132,6 +132,19 @@ const createWatchers = (state) => {
   return watchedState;
 };
 
+const updateInterfaceTexts = () => {
+  document.title = i18next.t('title');
+
+  const descriptionElement = document.querySelector('.lead');
+  descriptionElement.textContent = i18next.t('description');
+
+  const urlLabelElement = document.querySelector('label[for="url-input"]');
+  urlLabelElement.textContent = i18next.t('urlLabel');
+
+  const addButtonElement = document.querySelector('button[type="submit"]');
+  addButtonElement.textContent = i18next.t('addButton');
+};
+
 const checkForUpdates = (state, watchedState) => {
   state.urls.forEach((url) => {
     fetchRSS(url)
@@ -164,4 +177,4 @@ const initView = (state) => {
 };
 
 export default initView;
-export { checkForUpdates };
+export { checkForUpdates, updateInterfaceTexts };

@@ -20,7 +20,7 @@ const resources = {
       addButton: 'Добавить',
       invalidURL: 'Ссылка должна быть валидным URL',
       alreadyAdded: 'RSS уже существует',
-      parseError: 'Ошибка парсинга',
+      parseError: 'Ресурс не содержит валидный RSS',
       networkError: 'Ошибка сети',
       success: 'RSS успешно загружен',
     },
