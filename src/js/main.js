@@ -99,9 +99,15 @@ const handleSubmit = (event) => {
   })
     .catch((error) => {
       console.error('Error during URL validation:', error);
-      message.textContent = i18next.t('parseError');
+      if (error.message === 'networkError') {
+        message.textContent = i18next.t('networkError');
+      } else if (error.message === 'parseError') {
+        message.textContent = i18next.t('parseError');
+      } else {
+        message.textContent = i18next.t('unknownError');
+      }
       message.classList.remove('text-success');
-      message.classList.add('text-danger');
+      message.classList.remove('text-danger');
     })
     .finally(() => {
       submitButton.disabled = false; // Разблокируем кнопку в любом случае

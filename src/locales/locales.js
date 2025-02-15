@@ -10,6 +10,7 @@ const resources = {
       parseError: 'Parsing error',
       networkError: 'Network error',
       success: 'RSS feed succesfully added',
+      unknownError: 'Unknown error',
     },
   },
   ru: {
@@ -23,6 +24,7 @@ const resources = {
       parseError: 'Ресурс не содержит валидный RSS',
       networkError: 'Ошибка сети',
       success: 'RSS успешно загружен',
+      unknownError: 'Неизвестная ошибка',
     },
   },
 };
