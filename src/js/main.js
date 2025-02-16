@@ -54,36 +54,88 @@ const addFeed = (feed, posts) => {
   watchedState.posts = [...watchedState.posts, ...posts];// Плоский массив
 };
 
+// const handleSubmit = (event) => {
+//   event.preventDefault();
+//   const urlInput = document.getElementById('url-input');
+//   const url = urlInput.value;
+//   const submitButton = document.querySelector('button[type="submit"]');
+//   const message = document.getElementById('message');
+
+//   submitButton.disabled = true;
+
+//   if (state.urls.includes(url)) {
+//     watchedState.form.error = i18next.t('alreadyAdded');
+//     message.classList.remove('text-success');
+//     message.classList.add('text-danger');
+//     submitButton.disabled = false;
+//     return;
+//   }
+
+//   validateUrl(url).then((validatedUrl) => {
+//     if (!validatedUrl) {
+//       message.textContent = i18next.t(watchedState.form.error);
+//       message.classList.remove('text-success');
+//       message.classList.add('text-danger');
+//       submitButton.disabled = false;
+//       return;
+//     }
+
+//     fetchRSS(validatedUrl).then((data) => {
+//       const { feed, posts } = parseRSS(data);
+//       addFeed(feed, posts);
+//       state.urls.push(validatedUrl);
+//       urlInput.value = '';
+//       urlInput.focus();
+
+//       message.textContent = i18next.t('success');
+//       message.classList.remove('text-danger');
+//       message.classList.add('text-success');
+
+//       setTimeout(() => {
+//         message.textContent = '';
+//         message.classList.remove('text-success');
+//       }, 5000);
+//     });
+//   })
+//     .catch((error) => {
+//       if (error.message === 'networkError') {
+//         message.textContent = i18next.t('networkError');
+//       } else if (error.message === 'parseError') {
+//         message.textContent = i18next.t('parseError');
+//       } else {
+//         message.textContent = i18next.t('unknownError');
+//       }
+//       message.classList.remove('text-success');
+//       message.classList.remove('text-danger');
+//     })
+//     .finally(() => {
+//       submitButton.disabled = false; // Разблокируем кнопку в любом случае
+//     });
+// };
 const handleSubmit = (event) => {
   event.preventDefault();
   const urlInput = document.getElementById('url-input');
-  const url = urlInput.value;
+  const url = urlInput.value.trim();
   const submitButton = document.querySelector('button[type="submit"]');
   const message = document.getElementById('message');
 
   submitButton.disabled = true;
 
   if (state.urls.includes(url)) {
-    watchedState.form.error = i18next.t('alreadyAdded');
+    message.textContent = i18next.t('alreadyAdded');
     message.classList.remove('text-success');
     message.classList.add('text-danger');
     submitButton.disabled = false;
     return;
   }
 
-  validateUrl(url).then((validatedUrl) => {
-    if (!validatedUrl) {
-      message.textContent = i18next.t(watchedState.form.error);
-      message.classList.remove('text-success');
-      message.classList.add('text-danger');
-      submitButton.disabled = false;
-      return;
-    }
-
-    fetchRSS(validatedUrl).then((data) => {
-      const { feed, posts } = parseRSS(data);
+  validateUrl(url)
+    .then((validatedUrl) => fetchRSS(validatedUrl))
+    .then((data) => parseRSS(data))
+    .then(({ feed, posts }) => {
       addFeed(feed, posts);
-      state.urls.push(validatedUrl);
+      state.urls.push(url);
+
       urlInput.value = '';
       urlInput.focus();
 
@@ -95,22 +147,22 @@ const handleSubmit = (event) => {
         message.textContent = '';
         message.classList.remove('text-success');
       }, 5000);
-    });
-  })
+    })
     .catch((error) => {
-      console.error('Error during URL validation:', error);
       if (error.message === 'networkError') {
         message.textContent = i18next.t('networkError');
       } else if (error.message === 'parseError') {
-        message.textContent = i18next.t('parseError');
+        message.textContent = i18next.t('parseError'); // Сообщение о невалидном RSS
+        message.classList.remove('text-success');
+        message.classList.add('text-danger');
       } else {
         message.textContent = i18next.t('unknownError');
+        message.classList.remove('text-success');
+        message.classList.add('text-danger');
       }
-      message.classList.remove('text-success');
-      message.classList.remove('text-danger');
     })
     .finally(() => {
-      submitButton.disabled = false; // Разблокируем кнопку в любом случае
+      submitButton.disabled = false; // Разблокируем кнопку
     });
 };
 

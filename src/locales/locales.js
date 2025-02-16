@@ -7,7 +7,7 @@ const resources = {
       addButton: 'Add',
       invalidURL: 'Invalid URL',
       alreadyAdded: 'This URL is already added',
-      parseError: 'Parsing error',
+      parseError: 'Resource does not contain valid RSS',
       networkError: 'Network error',
       success: 'RSS feed succesfully added',
       unknownError: 'Unknown error',
