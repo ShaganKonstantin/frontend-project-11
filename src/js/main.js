@@ -96,7 +96,7 @@ const handleSubmit = (event) => {
         message.classList.remove('text-success');
         message.classList.add('text-danger');
       } else if (error.message === 'parseError') {
-        message.textContent = i18next.t('parseError'); // Сообщение о невалидном RSS
+        message.textContent = i18next.t('parseError');
         message.classList.remove('text-success');
         message.classList.add('text-danger');
       } else {
