@@ -63,51 +63,59 @@ const handleSubmit = (event) => {
 
   submitButton.disabled = true;
 
+  // Сбрасываем предыдущее сообщение
+  message.textContent = '';
+  message.classList.remove('text-success', 'text-danger');
+
+  // Проверка на дублирующийся URL
   if (state.urls.includes(url)) {
-    message.textContent = i18next.t('alreadyAdded');
-    message.classList.remove('text-success');
+    message.textContent = i18next.t('alreadyAdded'); // Убедитесь, что это сообщение установлено
     message.classList.add('text-danger');
-    submitButton.disabled = false;
+    submitButton.disabled = false; // Разблокируем кнопку
+    return;
   }
 
   validateUrl(url)
     .then((validatedUrl) => {
-      if (validatedUrl) { // вызываем фетч только когда валидатор вернул валидный урл
-        fetchRSS(validatedUrl)
-          .then((data) => parseRSS(data))
-          .then(({ feed, posts }) => {
-            addFeed(feed, posts);
-            state.urls.push(url);
-
-            urlInput.value = '';
-            urlInput.focus();
-
-            message.textContent = i18next.t('success');
-            message.classList.add('text-success');
-
-            setTimeout(() => {
-              message.textContent = '';
-              message.classList.remove('text-success');
-            }, 5000);
-          })
-          .catch((error) => {
-            if (error.message === 'networkError') {
-              message.textContent = i18next.t('networkError');
-              message.classList.add('text-danger');
-            } else if (error.message === 'parseError') {
-              message.textContent = i18next.t('parseError');
-              message.classList.add('text-danger');
-            } else {
-              message.textContent = i18next.t('unknownError');
-              message.classList.add('text-danger');
-            }
-          })
-          .finally(() => {
-            submitButton.disabled = false; // Разблокируем кнопку
-          });
-      } else {
-        submitButton.disabled = false;
+      if (validatedUrl) {
+        return fetchRSS(validatedUrl);
       }
+      throw new Error('invalidURL'); // Если URL не валиден
+    })
+    .then((data) => parseRSS(data))
+    .then(({ feed, posts }) => {
+      addFeed(feed, posts);
+      state.urls.push(url);
+
+      urlInput.value = '';
+      urlInput.focus();
+
+      message.textContent = i18next.t('success');
+      message.classList.add('text-success');
+
+      setTimeout(() => {
+        message.textContent = '';
+        message.classList.remove('text-success');
+      }, 5000);
+    })
+    .catch((error) => {
+      if (error.message === 'networkError') {
+        message.textContent = i18next.t('networkError');
+        message.classList.add('text-danger');
+      } else if (error.message === 'parseError') {
+        message.textContent = i18next.t('parseError');
+        message.classList.add('text-danger');
+      } else if (error.message === 'invalidURL') {
+        // Обработка ошибки валидации URL
+        message.textContent = i18next.t('invalidURL');
+        message.classList.add('text-danger');
+      } else {
+        message.textContent = i18next.t('unknownError');
+        message.classList.add('text-danger');
+      }
+    })
+    .finally(() => {
+      submitButton.disabled = false; // Разблокируем кнопку
     });
 };
 
