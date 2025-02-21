@@ -115,7 +115,7 @@ const initApp = async () => {
     state.urls.forEach((url) => {
       fetchRSS(url)
         .then((data) => {
-          const { feed, posts } = parseRSS(data);
+          const { posts } = parseRSS(data);
 
           const newPosts = posts.filter(
             (post) => !state.posts.some((existingPost) => existingPost.link === post.link),
@@ -127,7 +127,7 @@ const initApp = async () => {
             console.log(`No new posts for ${url}`);
           }
         })
-        .catch((error) => {
+        .catch(() => {
           console.error(`Fetching error for ${url}`);
         });
     });
