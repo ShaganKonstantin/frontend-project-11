@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import i18next from 'i18next';
+// eslint-disable-next-line no-unused-vars
 import * as bootstrap from 'bootstrap';
 import initView, { updateInterfaceTexts } from './view.js';
 import resources from '../locales/locales.js';
