@@ -1,8 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import i18next from 'i18next';
-// eslint-disable-next-line no-unused-vars
-import * as bootstrap from 'bootstrap';
+import 'bootstrap';
 import initView, { updateInterfaceTexts } from './view.js';
 import resources from '../locales/locales.js';
 import fetchRSS from './rssFetcher.js';
@@ -46,18 +45,23 @@ const initApp = () => {
 
       const watchedState = initView(state);
 
-      const urlSchema = yup.string().url().required();
-
-      const validateUrl = (url) => urlSchema
-        .validate(url)
-        .then(() => {
-          watchedState.form.error = null;
-          return url;
-        })
-        .catch(() => {
-          watchedState.form.error = i18next.t('invalidURL');
-          return null;
-        });
+      const validateUrl = (url) => {
+        const urlSchema = yup.string().url().required().notOneOf(state.urls);
+        return urlSchema
+          .validate(url)
+          .then(() => {
+            watchedState.form.error = null;
+            return url;
+          })
+          .catch((error) => {
+            if (error.path === 'url' && error.type === 'notOneOf') {
+              watchedState.form.error = i18next('alreadyAdded');
+            } else {
+              watchedState.form.error = i18next.t('invalidURL');
+            }
+            return null;
+          });
+      };
 
       const addFeed = (feed, posts) => {
         watchedState.feeds = [...watchedState.feeds, feed];
@@ -77,7 +81,6 @@ const initApp = () => {
 
         if (state.urls.includes(url)) {
           watchedState.form.error = 'alreadyAdded';
-          submitButton.disabled = false;
           return;
         }
 

@@ -11,6 +11,7 @@ const resources = {
       networkError: 'Network error',
       success: 'RSS feed succesfully added',
       unknownError: 'Unknown error',
+      preview: 'Preview',
     },
   },
   ru: {
@@ -25,6 +26,7 @@ const resources = {
       networkError: 'Ошибка сети',
       success: 'RSS успешно загружен',
       unknownError: 'Неизвестная ошибка',
+      preview: 'Просмотр',
     },
   },
 };

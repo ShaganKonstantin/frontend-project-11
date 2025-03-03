@@ -29,7 +29,7 @@ const renderPosts = (posts, postsList, watchedState) => {
 
     const previewButton = document.createElement('button');
     previewButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-    previewButton.textContent = 'Просмотр';
+    previewButton.textContent = i18next.t('preview');
     previewButton.dataset.postId = post.link;
     previewButton.dataset.bsToggle = 'modal';
     previewButton.dataset.bsTarget = '#modal';
@@ -60,7 +60,13 @@ const render = (state, watchedState) => {
 
   if (state.form.error) {
     urlInput.classList.add('is-invalid');
-    message.textContent = i18next.t(state.form.error);
+    if (state.form.error === 'alreadyAdded') {
+      message.textContent = i18next.t('alreadyAdded');
+    } else if (state.form.error === 'invalidURL') {
+      message.textContent = i18next.t('invalidURL');
+    } else if (state.form.error === 'parseError') {
+      message.textContent = i18next.t('parseError');
+    }
     message.classList.remove('text-success');
     message.classList.add('text-danger');
     submitButton.disabled = false;
