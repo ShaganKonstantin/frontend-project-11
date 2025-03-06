@@ -70,6 +70,8 @@ const render = (state, watchedState) => {
       message.textContent = i18next.t('invalidURL');
     } else if (state.form.error === 'parseError') {
       message.textContent = i18next.t('parseError');
+    } else if (state.form.error === 'networkError') {
+      message.textContent = i18next.t('networkError');
     }
     message.classList.remove('text-success');
     message.classList.add('text-danger');
