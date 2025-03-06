@@ -49,13 +49,17 @@ const render = (state, watchedState) => {
   const submitButton = document.querySelector('button[type="submit"]');
 
   if (state.message) {
-    console.log('Message to display:', state.message);
     message.textContent = i18next.t(state.message);
     message.classList.toggle('text-success', state.message === 'success');
     message.classList.toggle('text-danger', state.message !== 'success');
   } else {
     message.textContent = '';
     message.classList.remove('text-success', 'text-danger');
+  }
+
+  if (state.message === 'success') {
+    urlInput.value = '';
+    urlInput.focus();
   }
 
   if (state.form.error) {

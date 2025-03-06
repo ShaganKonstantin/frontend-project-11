@@ -70,11 +70,8 @@ const initApp = () => {
 
       const handleSubmit = (event) => {
         event.preventDefault();
-        const urlInput = document.getElementById('url-input');
-        const url = urlInput.value.trim();
-        const submitButton = document.querySelector('button[type="submit"]');
-
-        submitButton.disabled = true;
+        const formData = new FormData(event.target);
+        const url = formData.get('url');
 
         watchedState.form.error = null;
         state.message = null;
@@ -96,20 +93,14 @@ const initApp = () => {
             addFeed(feed, posts);
             state.urls.push(url);
 
-            urlInput.value = '';
-            urlInput.focus();
-
             watchedState.message = 'success';
             setTimeout(() => {
               watchedState.message = null;
             }, 5000);
           })
           .catch((error) => {
-            state.message = error.message;
+            // state.message = error.message;
             watchedState.form.error = error.message;
-          })
-          .finally(() => {
-            submitButton.disabled = false;
           });
       };
 
